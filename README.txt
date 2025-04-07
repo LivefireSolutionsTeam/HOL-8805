@@ -1,6 +1,6 @@
 THIS IS AN EXAMPLE. REPLACE THIS WITH YOUR OWN README.txt using the pattern below.
 
-This is customer facing so make it pretty.
+This is customer facing so please make it look professional. Thanks.
 
 This file can be updated and will be copied to the console desktop at startup.
 
