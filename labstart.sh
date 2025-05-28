@@ -1,5 +1,5 @@
 #!/bin/sh
-# version 1.10 11-April 2024
+# version 1.11 28-May 2025
 
 # in theory it should work like this using Linux jason query "jq"
 #lab_sku=`echo '{"username":"callb@vmware.com","tenant":"hol-test","lab":"HOL-8803-01"}' | jq '. | .lab' | sed s/\"//g`
@@ -15,20 +15,20 @@
 labstarttxt=/tmp/labstart.txt
 cp $labstarttxt .
 
-rawvlp=`cat $labstarttxt`
+rawvlp=$(cat $labstarttxt)
 
 # DEBUG
 #labstarttxt=labstart.txt
 
-tenant=`cat $labstarttxt | cut -f2 -d ':' | cut -f1 -d',' | sed s/}//g`
+tenant=$(cat $labstarttxt | cut -f2 -d ':' | cut -f1 -d',' | sed s/}//g)
 [ -z "${tenant}" ] && tenant=""
-student=`cat $labstarttxt | cut -f3 -d ':' | cut -f1 -d',' | sed s/}//g`
+student=$(cat $labstarttxt | cut -f3 -d ':' | cut -f1 -d',' | sed s/}//g)
 [ -z "${student}" ] || [ "${student}" = "unknown" ] && student=""
-lab_sku=`cat $labstarttxt | cut -f4 -d ':' | cut -f1 -d',' | sed s/}//g`
+lab_sku=$(cat $labstarttxt | cut -f4 -d ':' | cut -f1 -d',' | sed s/}//g)
 [ -z "${lab_sku}" ] && lab_sku=""
 #class=`cat $labstarttxt | cut -f5 -d ':' | cut -f1 -d',' | sed s/}//g`
 #[ -z "${class}" ] && class=""
-dp=`cat $labstarttxt | cut -f5 -d ':' | sed s/}//g`
+dp=$(cat $labstarttxt | cut -f5 -d ':' | sed s/}//g)
 [ -z "${dp}" ] && dp=""
 
 vlp="${tenant}:${student}:${lab_sku}:${dp}"
@@ -40,8 +40,8 @@ vlp="${tenant}:${student}:${lab_sku}:${dp}"
 rm $labstarttxt
 
 # /home/holuser/labstartup.sh creates the vPod_SKU.txt from the config.ini on the Main Console
-vPod_SKU=`cat /tmp/vPod_SKU.txt`
-holroot=/home/holuser/hol
+vPod_SKU=$(cat /tmp/vPod_SKU.txt)
+export holroot=/home/holuser/hol
 lmcholroot=/lmchol/hol
 wmcholroot=/wmchol/hol
 LMC=false
@@ -54,40 +54,38 @@ while true;do
       echo "LMC detected." >> ${logfile}
       mcholroot=${lmcholroot}
       desktopcfg='/lmchol/home/holuser/desktop-hol/VMware.config'
-      LMC=true
+      export LMC=true
       break
    elif [ -d ${wmcholroot} ];then
       logfile=${wmcholroot}/vmscript.log    
       echo "WMC detected." >> ${logfile}
-      mcholroot=${wmcholroot}
+      export mcholroot=${wmcholroot}
       desktopcfg='/wmchol/DesktopInfo/desktopinfo.ini'
-      WMC=true
+      export WMC=true
       break
    fi
    sleep 5
 done
 
-echo "Running captain script for $vPod_SKU because lab $lab_sku is active." >> $logfile
-echo "Here is the VLP lab start message: $rawvlp" >> $logfile
+echo "Running captain script for $vPod_SKU because lab $lab_sku is active." >> "$logfile"
+echo "Here is the VLP lab start message: $rawvlp" >> "$logfile"
 
 # update the desktop display if needed
-if [ ! -z "${lab_sku}" ];then
-   needed=`grep $lab_sku $desktopcfg`
+if [ -n "${lab_sku}" ];then
+   needed=$(grep "$lab_sku" "$desktopcfg")
 else
-   needed=`grep $vlp $desktopcfg`
+   needed=$(grep "$vlp" "$desktopcfg")
 fi
 
 if [ -z "$needed" ];then
    #cat ${desktopcfg} | sed s/$vPod_SKU/$vlp/g > /tmp/desktop.config
-   cat ${desktopcfg} | sed s/$vPod_SKU/$lab_sku/g > /tmp/desktop.config
-   cp /tmp/desktop.config $desktopcfg
+   sed "s/$vPod_SKU/$lab_sku/g" "${desktopcfg}" > /tmp/desktop.config
+   cp /tmp/desktop.config "$desktopcfg"
 fi
 
 # check and kill active labcheck processes
 # remove labcheck at jobs
-atrm $(atq | cut -f1)
+atrm "$(atq | cut -f1)"
 
 # add lab sku specific commands here:
-
-
 

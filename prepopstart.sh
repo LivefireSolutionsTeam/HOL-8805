@@ -16,22 +16,22 @@ prepoptxt=/tmp/prepop.txt
 
 # save in /home/holuser/prepop.txt in case review is needed
 cp $prepoptxt /home/holuser/prepop.txt
-rawvlp=`cat $prepoptxt`
+rawvlp=$(cat $prepoptxt)
 
-tenant=`cat $prepoptxt | cut -f1 -d ':' | cut -f1 -d',' | sed s/}//g`
+tenant=$(cat $prepoptxt | cut -f1 -d ':' | cut -f1 -d',' | sed s/}//g)
 [ -z "${tenant}" ] && tenant=""
-lab_sku=`cat $prepoptxt | cut -f2 -d ':' | cut -f1 -d',' | sed s/}//g`
+lab_sku=$(cat $prepoptxt | cut -f2 -d ':' | cut -f1 -d',' | sed s/}//g)
 [ -z "${lab_sku}" ] && lab_sku=""
-student=`cat $prepoptxt | cut -f3 -d ':' | cut -f1 -d',' | sed s/}//g`
+student=$(cat $prepoptxt | cut -f3 -d ':' | cut -f1 -d',' | sed s/}//g)
 [ -z "${student}" ] || [ "${student}" = "unknown" ] && student=""
-class=`cat $prepoptxt | cut -f4 -d ':' | cut -f1 -d',' | sed s/}//g`
+class=$(cat $prepoptxt | cut -f4 -d ':' | cut -f1 -d',' | sed s/}//g)
 [ -z "${class}" ] && class=""
-dp=`cat $prepoptxt | cut -f5 -d ':' | sed s/}//g`
+dp=$(cat $prepoptxt | cut -f5 -d ':' | sed s/}//g)
 [ -z "${dp}" ] && dp=""
 
 # this is the order of fields
 vlp="${tenant}:${lab_sku}:${student}:${class}:${dp}"
-
+echo "vlp=${vlp}" >> "$logfile"
 # DEBUG
 #echo $vlp
 #exit 0
@@ -40,8 +40,8 @@ vlp="${tenant}:${lab_sku}:${student}:${class}:${dp}"
 rm $prepoptxt
 
 # /home/holuser/labstartup.sh creates the vPod_SKU.txt from the config.ini on the Main Console
-vPod_SKU=`cat /tmp/vPod_SKU.txt`
-holroot=/home/holuser/hol
+vPod_SKU=$(cat /tmp/vPod_SKU.txt)
+export holroot=/home/holuser/hol
 lmcholroot=/lmchol/hol
 wmcholroot=/wmchol/hol
 LMC=false
@@ -54,21 +54,21 @@ while true;do
       echo "LMC detected." >> ${logfile}
       mcholroot=${lmcholroot}
       desktopcfg='/lmchol/home/holuser/desktop-hol/VMware.config'
-      LMC=true
+      export LMC=true
       break
    elif [ -d ${wmcholroot} ];then
       logfile=${wmcholroot}/skuactive.log    
       echo "WMC detected." >> ${logfile}
-      mcholroot=${wmcholroot}
-      desktopcfg='/wmchol/DesktopInfo/desktopinfo.ini'
-      WMC=true
+      export mcholroot=${wmcholroot}
+      export desktopcfg='/wmchol/DesktopInfo/desktopinfo.ini'
+      export WMC=true
       break
    fi
    sleep 5
 done
 
-echo "Running $dp Deployment Pool script for $vPod_SKU at prepop start." >> $logfile
-echo "Here is the full prepop message from VLP: $rawvlp" >> $logfile
+echo "Running $dp Deployment Pool script for $vPod_SKU at prepop start." >> "$logfile"
+echo "Here is the full prepop message from VLP: $rawvlp" >> "$logfile"
 
 # update the desktop display if needed
 # probably leave desktop display update to labstart.sh instead
