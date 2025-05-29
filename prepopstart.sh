@@ -13,7 +13,7 @@
 # this file is created when the prepop starts
 # get the lab information from VLP
 prepoptxt=/tmp/prepop.txt
-
+logfile=/tmp/prepopstart.log
 # save in /home/holuser/prepop.txt in case review is needed
 cp $prepoptxt /home/holuser/prepop.txt
 rawvlp=$(cat $prepoptxt)
