@@ -26,7 +26,7 @@ student=$(cat $prepoptxt | cut -f3 -d ':' | cut -f1 -d',' | sed s/}//g)
 [ -z "${student}" ] || [ "${student}" = "unknown" ] && student=""
 class=$(cat $prepoptxt | cut -f4 -d ':' | cut -f1 -d',' | sed s/}//g)
 [ -z "${class}" ] && class=""
-dp=$(cat $prepoptxt | cut -f5 -d ':' | sed s/}//g)
+dp=$(cat $prepoptxt | cut -f6 -d ':' | sed s/}//g)
 [ -z "${dp}" ] && dp=""
 
 # this is the order of fields
